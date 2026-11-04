@@ -1,0 +1,16 @@
+{
+  "name": "jarvis-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Página web de Jarvis con chat conectado a una API de IA.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
