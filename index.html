@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jarvis | Asistente virtual</title>
+    <meta
+      name="description"
+      content="Jarvis, un asistente virtual con interfaz web para ayudarte, buscar información y responder rápido."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="background-glow glow-1"></div>
+    <div class="background-glow glow-2"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">J</div>
+        <span>Jarvis</span>
+      </div>
+      <nav class="nav">
+        <a href="#inicio">Inicio</a>
+        <a href="#funciones">Funciones</a>
+        <a href="#chat">Chat</a>
+      </nav>
+    </header>
+
+    <main id="inicio" class="container">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Asistente inteligente</p>
+          <h1>Tu compañero digital, listo para ayudarte.</h1>
+          <p class="subtitle">
+            Jarvis es un asistente virtual pensado para acompañarte, responder dudas,
+            organizar tareas y ofrecer apoyo en tu día a día.
+          </p>
+
+          <div class="cta-row">
+            <a class="primary-btn" href="#chat">Hablar con Jarvis</a>
+            <a class="secondary-btn" href="#funciones">Ver funciones</a>
+          </div>
+
+          <ul class="stats">
+            <li><strong>24/7</strong><span>Disponible</span></li>
+            <li><strong>Rápido</strong><span>Respuestas</span></li>
+            <li><strong>Personal</strong><span>Experiencia</span></li>
+          </ul>
+        </div>
+
+        <div class="hero-visual" aria-label="Panel de Jarvis">
+          <div class="orb"></div>
+          <div class="panel-card main-card">
+            <div class="card-header">
+              <span class="dot green"></span>
+              <span class="dot yellow"></span>
+              <span class="dot red"></span>
+            </div>
+            <div class="card-body">
+              <div class="pulse-ring"></div>
+              <div class="assistant-face">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="smile"></div>
+              </div>
+              <p>Hola, soy Jarvis.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="funciones" class="features">
+        <div class="section-heading">
+          <p class="eyebrow">Funciones</p>
+          <h2>Todo lo que puede hacer</h2>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="icon">💬</div>
+            <h3>Chat natural</h3>
+            <p>Responde de forma clara y amigable a preguntas y conversaciones.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">✅</div>
+            <h3>Organización</h3>
+            <p>Ayuda a estructurar tareas, recordatorios y flujo de trabajo.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">🤝</div>
+            <h3>Soporte constante</h3>
+            <p>Te acompaña como un aliado digital que siempre está presente.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="chat" class="chat-section">
+        <div class="section-heading">
+          <p class="eyebrow">Prueba rápida</p>
+          <h2>Habla con Jarvis</h2>
+        </div>
+
+        <div class="chat-window" aria-live="polite">
+          <div class="message bot">
+            Hola. Soy Jarvis. ¿En qué puedo ayudarte hoy?
+          </div>
+        </div>
+
+        <form class="composer" id="chat-form">
+          <label class="sr-only" for="user-input">Escribe tu mensaje</label>
+          <input
+            id="user-input"
+            type="text"
+            placeholder="Escribe tu mensaje..."
+            autocomplete="off"
+          />
+          <button type="submit">Enviar</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
