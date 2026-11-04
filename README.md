@@ -1,57 +1,34 @@
-const form = document.getElementById('chat-form');
-const input = document.getElementById('user-input');
-const chatWindow = document.querySelector('.chat-window');
+# Jarvis
 
-function addMessage(text, sender) {
-  const msg = document.createElement('div');
-  msg.className = `message ${sender}`;
-  msg.textContent = text;
-  chatWindow.appendChild(msg);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
+Página web en español para Jarvis, con un chat conectado a una API de IA mediante un backend Node.js. La clave de API se configura solo en el servidor y no se publica en el navegador.
 
-function getBotReply(userText) {
-  const text = userText.toLowerCase();
+## Requisitos
 
-  if (text.includes('hola') || text.includes('buenas') || text.includes('hello')) {
-    return '¡Hola! Estoy aquí para ayudarte. ¿Qué necesitas hoy?';
-  }
+- Node.js 18 o posterior
+- Una clave de API de OpenAI para habilitar las respuestas de IA (el uso de la API puede tener costo según tu cuenta y plan)
 
-  if (text.includes('ayuda') || text.includes('puedes') || text.includes('necesito')) {
-    return 'Claro. Puedo ayudarte a organizar ideas, responder preguntas y acompañarte en tus tareas. Cuéntame más.';
-  }
+## Ejecutar localmente
 
-  if (text.includes('precio') || text.includes('costo') || text.includes('cuánto')) {
-    return 'Esta demo de Jarvis es un prototipo web y está lista para personalizarse según tus necesidades.';
-  }
+1. Descarga o clona este repositorio y entra en su carpeta.
+2. Instala las dependencias con `npm install`.
+3. Configura las variables de entorno `OPENAI_API_KEY` y, opcionalmente, `OPENAI_MODEL` (por defecto `gpt-4o-mini`). Puedes copiar `.env.example` como referencia, pero el servidor no carga archivos `.env` automáticamente: configura las variables en tu terminal o en el panel de tu proveedor de hosting.
+4. Inicia el sitio con `npm start` y abre `http://localhost:3000`.
 
-  if (text.includes('tarea') || text.includes('plan') || text.includes('organizar')) {
-    return 'Perfecto. Podemos estructurar tus tareas por prioridad, crear un plan y seguir paso a paso.';
-  }
+En macOS/Linux puedes iniciar el servidor así:
 
-  if (text.includes('gracias') || text.includes('thank you')) {
-    return 'De nada. Estoy aquí para ayudarte siempre que lo necesites.';
-  }
+```bash
+OPENAI_API_KEY="tu-clave-secreta" npm start
+```
 
-  if (text.includes('jarvis')) {
-    return 'Sí, soy Jarvis. Un asistente virtual pensado para acompañarte y resolverte la vida digital.';
-  }
+En PowerShell:
 
-  return 'Interesante. Estoy aprendiendo contigo. Si me dices más detalles, podré ayudarte mejor.';
-}
+```powershell
+$env:OPENAI_API_KEY="tu-clave-secreta"
+npm start
+```
 
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
+Sin `OPENAI_API_KEY`, la página carga, pero el chat muestra que falta configurar la IA. Nunca pongas la clave en `app.js`, en el HTML ni en el repositorio.
 
-  const userText = input.value.trim();
-  if (!userText) return;
+## Publicación
 
-  addMessage(userText, 'user');
-  input.value = '';
-
-  const reply = getBotReply(userText);
-
-  setTimeout(() => {
-    addMessage(reply, 'bot');
-  }, 300);
-});
+El backend necesita un servicio de hosting que ejecute Node.js, como Render, Railway o un servidor propio. Configura `OPENAI_API_KEY` como variable secreta en el servicio y usa `npm start` como comando de inicio. GitHub Pages puede publicar archivos estáticos, pero no puede ejecutar este backend; para usar el chat con IA, frontend y endpoint `/api/chat` deben servirse desde el mismo dominio o configurarse con un proxy seguro.
