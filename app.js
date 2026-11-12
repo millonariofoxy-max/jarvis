@@ -13,7 +13,7 @@ function addMessage(text, sender, { loading = false } = {}) {
   if (sender === 'bot') {
     const avatar = document.createElement('span');
     avatar.className = 'message-avatar';
-    avatar.textContent = 'J';
+    avatar.textContent = 'V';
     message.appendChild(avatar);
   }
   const bubble = document.createElement('div');
@@ -31,10 +31,10 @@ function localReply(text) {
     return '¡Hola! Me alegra que estés aquí. Cuéntame qué tienes en mente y lo pensamos juntos.';
   }
   if (/\b(organiza|organizar|planifica|planificar|tareas|día|semana)\b/.test(normalized)) {
-    return '¡Vamos paso a paso! 1) Anota todo lo que tienes pendiente. 2) Elige lo más importante o urgente. 3) Divide esa tarea en un primer paso de 15 minutos. ¿Qué cosas necesitas organizar?';
+    return '¡Vamos paso a paso! 1) Anota todo lo que tienes pendiente. 2) Elige lo más importante o urgente. 3) Divide esa tarea en un primer paso de 15 minutos. ¿Qué cosas necesitas organizar hoy?';
   }
   if (/\b(idea|creativ|inspir|proyecto)\b/.test(normalized)) {
-    return 'Prueba este disparador creativo: combina algo que ya te gusta con algo que te gustaría aprender. Por ejemplo, crea una pequeña guía, lista o prototipo que una ambas cosas. ¿Sobre qué tema quieres una idea más concreta?';
+    return 'Prueba este disparador creativo: combina algo que ya te gusta con algo que te gustaría aprender. Por ejemplo, crea una pequeña guía, lista o prototipo que una ambas cosas. ¿Sobre qué tema quieres jugar?';
   }
   if (/\b(hora|fecha|día de hoy)\b/.test(normalized)) {
     return `La fecha y hora de tu dispositivo son ${new Intl.DateTimeFormat('es', { dateStyle: 'full', timeStyle: 'short' }).format(new Date())}. ¿Quieres que te ayude a planificar algo para hoy?`;
@@ -71,7 +71,7 @@ form.addEventListener('submit', async (event) => {
   sendButton.disabled = true;
   input.disabled = true;
   sendButton.querySelector('span:first-child').textContent = 'Pensando';
-  const loading = addMessage('Jarvis está pensando', 'bot', { loading: true });
+  const loading = addMessage('Vos está pensando', 'bot', { loading: true });
 
   try {
     const { reply, demo } = await getReply();
@@ -103,7 +103,7 @@ clearButton.addEventListener('click', () => {
   if (sendButton.disabled) return;
   conversation.length = 0;
   chatWindow.replaceChildren();
-  addMessage('Hola, soy Jarvis. ¿Qué te gustaría pensar, aprender u organizar hoy?', 'bot');
-  modeLabel.textContent = 'Jarvis está aquí';
+  addMessage('Hola, soy Vos. ¿Qué te gustaría pensar, aprender u organizar hoy?', 'bot');
+  modeLabel.textContent = 'Vos está aquí';
   input.focus();
 });
