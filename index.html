@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090b12" />
-    <meta name="description" content="Chat de vos: conversación directa y simple con tu asistente virtual." />
-    <title>Vos — Chat</title>
+    <meta name="description" content="Habla por voz con Vos, tu asistente virtual." />
+    <title>Vos — Asistente de voz</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,41 +13,24 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#chat" aria-label="Vos, chat">
+      <a class="brand" href="#voz" aria-label="Vos, asistente de voz">
         <span class="brand-symbol" aria-hidden="true"><span></span><span></span><span></span></span>
         <span>vos<span class="brand-period">.</span></span>
       </a>
+      <button class="clear-chat" id="clear-chat" type="button">Nueva conversación</button>
     </header>
 
-    <main id="inicio">
-      <section id="chat" class="chat-section page-width">
-        <div class="chat-shell">
-          <div class="chat-topline">
-            <div class="chat-identity">
-              <span class="chat-avatar">V</span>
-              <span><strong>Vos</strong><small>Tu asistente</small></span>
-            </div>
-            <button class="clear-chat" id="clear-chat" type="button">Borrar chat</button>
-          </div>
-
-          <div class="chat-window" role="log" aria-live="polite" aria-relevant="additions text">
-            <div class="message bot"><span class="message-avatar">V</span><div class="message-bubble">Hola, soy Vos. ¿Qué te gustaría pensar, aprender u organizar hoy?</div></div>
-          </div>
-
-          <div class="suggestions" aria-label="Ideas para empezar">
-            <button type="button" class="suggestion">Ayúdame a organizar mi día</button>
-            <button type="button" class="suggestion">Dame una idea creativa</button>
-            <button type="button" class="suggestion">Explícame algo interesante</button>
-          </div>
-
-          <form class="composer" id="chat-form">
-            <label class="sr-only" for="user-input">Escribe tu mensaje para Vos</label>
-            <input id="user-input" type="text" placeholder="Escribe lo que tienes en mente…" autocomplete="off" maxlength="4000" />
-            <button type="submit" aria-label="Enviar mensaje"><span>Enviar</span><span class="send-arrow" aria-hidden="true">↗</span></button>
-          </form>
-
-          <p class="chat-footnote">Vos puede equivocarse. Para temas importantes, verifica la información.</p>
-        </div>
+    <main id="voz">
+      <section class="voice-panel" aria-labelledby="voice-title">
+        <div class="voice-orb" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="eyebrow">TU ASISTENTE DE VOZ</p>
+        <h1 id="voice-title">Hablemos.</h1>
+        <p class="voice-description">Toca el micrófono y háblame. Te voy a responder en voz alta.</p>
+        <p class="voice-status" id="voice-status" role="status" aria-live="polite">Toca el micrófono para hablar</p>
+        <button class="mic-button" id="mic-button" type="button" aria-label="Empezar a hablar" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4m-4 0h8"/></svg>
+        </button>
+        <p class="voice-hint">Pulsa el botón para empezar a hablar</p>
       </section>
     </main>
 

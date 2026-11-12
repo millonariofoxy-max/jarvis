@@ -1,28 +1,16 @@
-const form = document.getElementById('chat-form');
-const input = document.getElementById('user-input');
-const chatWindow = document.querySelector('.chat-window');
-const sendButton = form.querySelector('button[type="submit"]');
+const micButton = document.getElementById('mic-button');
+const statusLabel = document.getElementById('voice-status');
 const clearButton = document.getElementById('clear-chat');
-const modeLabel = document.getElementById('chat-mode');
-const suggestions = document.querySelector('.suggestions');
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const conversation = [];
+let recognition;
+let recognizedText = '';
+let recognitionError = '';
+let busy = false;
 
-function addMessage(text, sender, { loading = false } = {}) {
-  const message = document.createElement('div');
-  message.className = `message ${sender}${loading ? ' is-loading' : ''}`;
-  if (sender === 'bot') {
-    const avatar = document.createElement('span');
-    avatar.className = 'message-avatar';
-    avatar.textContent = 'V';
-    message.appendChild(avatar);
-  }
-  const bubble = document.createElement('div');
-  bubble.className = 'message-bubble';
-  bubble.textContent = text;
-  message.appendChild(bubble);
-  chatWindow.appendChild(message);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-  return { message, bubble };
+function setStatus(text, state = '') {
+  statusLabel.textContent = text;
+  document.body.dataset.state = state;
 }
 
 function localReply(text) {
@@ -31,21 +19,18 @@ function localReply(text) {
     return '¡Hola! Me alegra que estés aquí. Cuéntame qué tienes en mente y lo pensamos juntos.';
   }
   if (/\b(organiza|organizar|planifica|planificar|tareas|día|semana)\b/.test(normalized)) {
-    return '¡Vamos paso a paso! 1) Anota todo lo que tienes pendiente. 2) Elige lo más importante o urgente. 3) Divide esa tarea en un primer paso de 15 minutos. ¿Qué cosas necesitas organizar hoy?';
+    return '¡Vamos paso a paso! Anota lo que tienes pendiente, elige lo más importante y divídelo en un primer paso de 15 minutos. ¿Qué necesitas organizar hoy?';
   }
   if (/\b(idea|creativ|inspir|proyecto)\b/.test(normalized)) {
-    return 'Prueba este disparador creativo: combina algo que ya te gusta con algo que te gustaría aprender. Por ejemplo, crea una pequeña guía, lista o prototipo que una ambas cosas. ¿Sobre qué tema quieres jugar?';
+    return 'Una forma de empezar es combinar algo que ya te gusta con algo nuevo que quieras aprender. ¿Sobre qué tema te gustaría pensar?';
   }
   if (/\b(hora|fecha|día de hoy)\b/.test(normalized)) {
-    return `La fecha y hora de tu dispositivo son ${new Intl.DateTimeFormat('es', { dateStyle: 'full', timeStyle: 'short' }).format(new Date())}. ¿Quieres que te ayude a planificar algo para hoy?`;
+    return `La fecha y hora de tu dispositivo son ${new Intl.DateTimeFormat('es', { dateStyle: 'full', timeStyle: 'short' }).format(new Date())}.`;
   }
   if (/\b(gracias|muchas gracias)\b/.test(normalized)) {
-    return '¡De nada! Aquí estoy para ayudarte. ¿Hay algo más que quieras resolver?';
+    return '¡De nada! Aquí estoy para ayudarte.';
   }
-  if (/\b(ayuda|puedes hacer|qué haces|que haces)\b/.test(normalized)) {
-    return 'Puedo ayudarte a ordenar ideas, dividir tareas, proponer opciones o explicarte conceptos. Cuéntame un poco más sobre lo que necesitas y empezamos.';
-  }
-  return `Gracias por contármelo. Para empezar, podríamos separar esto en: qué quieres conseguir, qué te está frenando y cuál sería un primer paso pequeño. ¿Cuál de esas partes quieres abordar primero?`;
+  return 'Te escucho. Cuéntame un poco más y vemos juntos cuál puede ser el siguiente paso.';
 }
 
 async function getReply() {
@@ -55,55 +40,107 @@ async function getReply() {
     body: JSON.stringify({ messages: conversation.slice(-12) })
   });
   const data = await response.json().catch(() => ({}));
-  if (response.ok && typeof data.reply === 'string') return { reply: data.reply, demo: false };
-  if (response.status === 503) return { reply: localReply(conversation.at(-1).content), demo: true };
-  throw new Error(data.error || 'No se pudo enviar el mensaje. Inténtalo de nuevo.');
+  if (response.ok && typeof data.reply === 'string') return data.reply;
+  if (response.status === 503) return localReply(conversation.at(-1).content);
+  throw new Error(data.error || 'No pude responder. Comprueba tu conexión e inténtalo otra vez.');
 }
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const userText = input.value.trim();
-  if (!userText || sendButton.disabled) return;
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    setStatus('Tu navegador no admite respuestas por voz.', 'error');
+    busy = false;
+    return;
+  }
 
-  addMessage(userText, 'user');
-  input.value = '';
-  conversation.push({ role: 'user', content: userText });
-  sendButton.disabled = true;
-  input.disabled = true;
-  sendButton.querySelector('span:first-child').textContent = 'Pensando';
-  const loading = addMessage('Vos está pensando', 'bot', { loading: true });
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'es-AR';
+  utterance.onstart = () => setStatus('Vos te está respondiendo…', 'speaking');
+  utterance.onend = () => {
+    busy = false;
+    setStatus('Toca el micrófono para hablar');
+  };
+  utterance.onerror = () => {
+    busy = false;
+    setStatus('No pude reproducir la respuesta. Toca el micrófono para seguir.', 'error');
+  };
+  window.speechSynthesis.speak(utterance);
+}
+
+async function sendToVos(text) {
+  if (!text || busy) return;
+  busy = true;
+  conversation.push({ role: 'user', content: text });
+  setStatus('Vos está pensando…', 'thinking');
 
   try {
-    const { reply, demo } = await getReply();
-    loading.bubble.textContent = reply;
-    loading.message.classList.remove('is-loading');
+    const reply = await getReply();
     conversation.push({ role: 'assistant', content: reply });
-    if (demo) modeLabel.textContent = 'Modo de prueba · configura la IA para respuestas completas';
+    speak(reply);
   } catch (error) {
-    loading.bubble.textContent = error.message || 'Ocurrió un error. Inténtalo de nuevo.';
-    loading.message.classList.remove('is-loading');
-    conversation.pop();
-  } finally {
-    sendButton.disabled = false;
-    input.disabled = false;
-    sendButton.querySelector('span:first-child').textContent = 'Enviar';
-    input.focus();
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    busy = false;
+    setStatus(error.message || 'Ocurrió un error. Inténtalo de nuevo.', 'error');
   }
-});
+}
 
-suggestions.addEventListener('click', (event) => {
-  const button = event.target.closest('.suggestion');
-  if (!button || sendButton.disabled) return;
-  input.value = button.textContent.trim();
-  form.requestSubmit();
-});
+if (!SpeechRecognition) {
+  micButton.disabled = true;
+  setStatus('Este navegador no admite dictado por voz. Prueba Chrome o Edge.', 'error');
+} else {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-AR';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    recognizedText = '';
+    recognitionError = '';
+    micButton.setAttribute('aria-pressed', 'true');
+    micButton.setAttribute('aria-label', 'Dejar de hablar');
+    setStatus('Te escucho…', 'listening');
+  };
+
+  recognition.onresult = (event) => {
+    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      if (event.results[index].isFinal) recognizedText += `${event.results[index][0].transcript} `;
+    }
+  };
+
+  recognition.onerror = (event) => {
+    recognitionError = event.error === 'not-allowed'
+      ? 'Necesito permiso para usar el micrófono. Actívalo en la configuración del navegador.'
+      : event.error === 'no-speech'
+        ? 'No te escuché. Toca el micrófono para volver a intentar.'
+        : 'No pude acceder al micrófono. Revisa los permisos y vuelve a intentar.';
+  };
+
+  recognition.onend = () => {
+    micButton.setAttribute('aria-pressed', 'false');
+    micButton.setAttribute('aria-label', 'Empezar a hablar');
+    if (recognitionError) {
+      setStatus(recognitionError, 'error');
+      return;
+    }
+    if (recognizedText.trim()) {
+      sendToVos(recognizedText.trim());
+    } else if (!busy) {
+      setStatus('No te escuché. Toca el micrófono para volver a intentar.');
+    }
+  };
+
+  micButton.addEventListener('click', () => {
+    if (busy) return;
+    try {
+      recognition.start();
+    } catch {
+      setStatus('Espera un momento y vuelve a tocar el micrófono.', 'error');
+    }
+  });
+}
 
 clearButton.addEventListener('click', () => {
-  if (sendButton.disabled) return;
+  if (busy) return;
   conversation.length = 0;
-  chatWindow.replaceChildren();
-  addMessage('Hola, soy Vos. ¿Qué te gustaría pensar, aprender u organizar hoy?', 'bot');
-  modeLabel.textContent = 'Vos está aquí';
-  input.focus();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  setStatus('Toca el micrófono para hablar');
 });

@@ -45,7 +45,7 @@ app.post('/api/chat', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'Eres Jarvis, un asistente virtual amigable, útil y honesto. Responde en español, salvo que el usuario prefiera otro idioma. No afirmes tener conciencia, emociones propias ni capacidad para realizar acciones fuera de este chat.'
+            content: 'Eres Vos, un asistente virtual amigable, útil y honesto. Responde en español rioplatense, de forma natural y concisa, como en una conversación hablada. No afirmes tener conciencia ni emociones propias. Si no sabes algo, dilo con claridad.'
           },
           ...messages.map(({ role, content }) => ({ role, content: content.trim() }))
         ],
@@ -75,5 +75,5 @@ app.post('/api/chat', async (req, res) => {
 app.use(express.static(path.join(__dirname)));
 
 app.listen(port, () => {
-  console.log(`Jarvis está disponible en http://localhost:${port}`);
+  console.log(`Vos está disponible en http://localhost:${port}`);
 });
